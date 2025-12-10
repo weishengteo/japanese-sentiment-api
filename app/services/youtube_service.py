@@ -2,6 +2,7 @@ from googleapiclient.discovery import build
 from app.config.settings import settings
 from app.dto.request import YoutubeInput, TextInput
 from app.services.sentiment_service import analyze_sentiment
+from sqlalchemy.orm import Session
 
 youtube = build(
     "youtube",
@@ -32,12 +33,12 @@ def get_youtube_comments(input: YoutubeInput):
 
     return comments[:max_comments]
 
-def get_youtube_sentiment(input: YoutubeInput):
+def get_youtube_sentiment(input: YoutubeInput, db: Session):
     comments = get_youtube_comments(input)
 
     res = []
     for comment in comments:
-        sentiment = analyze_sentiment(TextInput(text = comment))
+        sentiment = analyze_sentiment(TextInput(text = comment), db)
         res.append({
             "comment": comment,
             "sentiment": sentiment["sentiment"],

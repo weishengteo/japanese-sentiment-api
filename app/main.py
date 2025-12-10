@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from app.controller.sentiment import router as sentiment_router
 from app.controller.youtube import router as youtube_router
+from app.config.database import init_db
+
+# Initialize DB
+init_db()
 
 # Fast API initialization
 app = FastAPI(title = "Japanese Sentiment Analysis API")
