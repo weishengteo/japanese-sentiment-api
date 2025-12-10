@@ -21,7 +21,7 @@ def analyze_sentiment(input: TextInput):
 
     # Set threshold for Neutral status
     threshold = 0.7
-    sentiment = result[0]["label"] if result[0]["score"] > threshold else "NEUTRAL"
+    sentiment = result[0]["label"].upper() if result[0]["score"] > threshold else "NEUTRAL"
     
     return {"text": input.text, "sentiment": sentiment, "score": result[0]["score"], "source": "model"}
 

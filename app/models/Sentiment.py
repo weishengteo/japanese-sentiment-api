@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, UniqueConstraint
 from app.config.database import Base
 
 class Sentiment(Base):
@@ -9,3 +9,7 @@ class Sentiment(Base):
     text = Column(String, nullable=False)
     sentiment = Column(String, nullable=False)
     score = Column(Float, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("video_id", "text", name="uq_video_text"),
+    )

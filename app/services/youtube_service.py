@@ -4,6 +4,7 @@ from app.dto.request import YoutubeInput, TextInput
 from app.services.sentiment_service import analyze_sentiment
 from sqlalchemy.orm import Session
 from app.models.Sentiment import Sentiment
+from sqlalchemy.dialects.postgresql import insert
 
 youtube = build(
     "youtube",
@@ -70,9 +71,21 @@ def get_youtube_sentiment(input: YoutubeInput, db: Session):
 
     return {"video_id": input.video_id, "comments_sentiment": res, "sentiment_counts": sentiment_count}
 
-def save_sentiments_bulk(db: Session, record: list[Sentiment]):
+def save_sentiments_bulk(db: Session, records: list[Sentiment]):
     try:
-        db.add_all(record)
+        # Use PostgreSQL upsert to skip duplicates
+        stmt = insert(Sentiment).values([{
+            "video_id": r.video_id,
+            "text": r.text,
+            "sentiment": r.sentiment,
+            "score": r.score
+        } for r in records])
+        
+        stmt = stmt.on_conflict_do_nothing(
+            index_elements=['video_id', 'text']
+        )
+        
+        db.execute(stmt)
         db.commit()
     except Exception as e:
         db.rollback()
